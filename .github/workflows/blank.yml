@@ -8,25 +8,35 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Seleccionar versión de Xcode
+      - name: Seleccionar Xcode 15.4
         run: |
           sudo xcode-select -s /Applications/Xcode_15.4.app
           xcodebuild -version
 
-      - name: Listar dispositivos disponibles
-        run: xcrun simctl list devices
-
       - name: Bootear simulador iPhone 14
         run: |
-          DEVICE_ID=$(xcrun simctl list devices | grep "iPhone 14" | grep -v unavailable | head -n 1 | awk '{print $NF}' | tr -d '()')
+          # Buscar un iPhone 14 disponible
+          DEVICE_ID=$(xcrun simctl list devices available | grep "iPhone 14 (" | head -n 1 | awk '{print $NF}' | tr -d '()')
+
           echo "📱 Usando dispositivo $DEVICE_ID"
           
-          # Bootear
+          # Bootear simulador
           xcrun simctl boot "$DEVICE_ID"
 
-          # Abrir la app de simulador en background
-          open -a Simulator
+          # Lanzar simulador (aunque en GitHub no se ve la ventana gráfica)
+          open -a Simulator || true
 
           # Esperar que esté listo
           xcrun simctl bootstatus "$DEVICE_ID" -b
           echo "✅ Simulador abierto y listo"
+
+      - name: Screenshot del simulador
+        run: |
+          mkdir -p artifacts
+          xcrun simctl io booted screenshot artifacts/sim.png
+
+      - name: Subir screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-simulador
+          path: artifacts/sim.png
