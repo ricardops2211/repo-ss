@@ -14,9 +14,9 @@ jobs:
       - name: Listar dispositivos disponibles
         run: xcrun simctl list devices available
 
-      - name: Bootear primer simulador disponible
+      - name: Bootear simulador válido
         run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep "Shutdown" | head -n 1 | sed -E 's/.*\(([A-F0-9\-]+)\) \(Shutdown\)/\1/')
+          DEVICE_ID=$(xcrun simctl list devices available | grep -E "iPhone [0-9]+" | grep -m1 -oE "[0-9A-F\-]{36}")
           echo "📱 Usando dispositivo $DEVICE_ID"
 
           xcrun simctl boot "$DEVICE_ID"
@@ -33,3 +33,4 @@ jobs:
         with:
           name: simulador
           path: artifacts/sim.png
+
