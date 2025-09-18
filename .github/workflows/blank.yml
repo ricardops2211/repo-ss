@@ -16,9 +16,9 @@ jobs:
 
       - name: Bootear primer simulador disponible
         run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "Shutdown" | awk '{print $NF}' | tr -d '()')
+          DEVICE_ID=$(xcrun simctl list devices available | grep "Shutdown" | head -n 1 | sed -E 's/.*\(([A-F0-9\-]+)\) \(Shutdown\)/\1/')
           echo "📱 Usando dispositivo $DEVICE_ID"
-          
+
           xcrun simctl boot "$DEVICE_ID"
           xcrun simctl bootstatus "$DEVICE_ID" -b
           echo "✅ Simulador abierto y listo"
