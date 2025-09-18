@@ -8,18 +8,18 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Confirmar Xcode activo
+      - name: Confirmar versión de Xcode
         run: xcodebuild -version
 
-      - name: Bootear simulador iPhone 14
+      - name: Listar dispositivos disponibles
+        run: xcrun simctl list devices available
+
+      - name: Bootear primer simulador disponible
         run: |
-          DEVICE_ID=$(xcrun simctl list devices available | grep "iPhone 14 (" | head -n 1 | awk '{print $NF}' | tr -d '()')
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m 1 "Shutdown" | awk '{print $NF}' | tr -d '()')
           echo "📱 Usando dispositivo $DEVICE_ID"
           
-          # Bootear simulador
-          xcrun simctl boot "$DEVICE_ID" || true
-
-          # Esperar que esté listo
+          xcrun simctl boot "$DEVICE_ID"
           xcrun simctl bootstatus "$DEVICE_ID" -b
           echo "✅ Simulador abierto y listo"
 
